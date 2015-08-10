@@ -1,4 +1,4 @@
-var metadata = {
+var FIOITaskMetaData = {
 
   limits : {
     time : { "*" : 2, "cpp" : 1 },

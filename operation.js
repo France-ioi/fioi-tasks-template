@@ -28,8 +28,9 @@ task.showViews = function(views, callback)
    callback();
 };
 
+task.printViewChooser = true; // miniPlatform shows view chooser
 
-task.load = function(callback)
+task.load = function(views, callback) // TODO: handle views
 {
   var sSelectedLanguage = "C++"; // TODO : Parametre lors du chargement
   
@@ -76,8 +77,8 @@ task.load = function(callback)
     {
       var result = s;
       
-      if (typeof metadata.sources != "undefined")
-      for (var iGroup in metadata.sources)
+      if (typeof FIOITaskMetaData.sources != "undefined")
+      for (var iGroup in FIOITaskMetaData.sources)
       {
         var group = $("#sources-" + iGroup).html();
         var groupfull = "<div class='codeTabs'>" + group + "</div>";
@@ -218,17 +219,17 @@ task.load = function(callback)
         var time = "";
         var memory = "";
           
-        if (typeof metadata.limits != "undefined")
+        if (typeof FIOITaskMetaData.limits != "undefined")
         {
-          if (typeof metadata.limits.time[sSelectedLanguage] != "undefined")
-            time = translate("time", json.language).capitalize() + " : " + metadata.limits.time[sSelectedLanguage] + "s<br />";
-          else if (typeof metadata.limits.time["*"] != "undefined")
-            time = translate("time", json.language).capitalize() + " : " + metadata.limits.time["*"] + "s<br />";
+          if (typeof FIOITaskMetaData.limits.time[sSelectedLanguage] != "undefined")
+            time = translate("time", json.language).capitalize() + " : " + FIOITaskMetaData.limits.time[sSelectedLanguage] + "s<br />";
+          else if (typeof FIOITaskMetaData.limits.time["*"] != "undefined")
+            time = translate("time", json.language).capitalize() + " : " + FIOITaskMetaData.limits.time["*"] + "s<br />";
           
-          if (typeof metadata.limits.memory[sSelectedLanguage] != "undefined")
-            memory = translate("memory", json.language).capitalize() + " : " + metadata.limits.memory[sSelectedLanguage] + "ko<br />";
-          else if (typeof metadata.limits.memory["*"] != "undefined")
-            memory = translate("memory", json.language).capitalize() + " : " + metadata.limits.memory["*"] + "ko<br />";
+          if (typeof FIOITaskMetaData.limits.memory[sSelectedLanguage] != "undefined")
+            memory = translate("memory", json.language).capitalize() + " : " + FIOITaskMetaData.limits.memory[sSelectedLanguage] + "ko<br />";
+          else if (typeof FIOITaskMetaData.limits.memory["*"] != "undefined")
+            memory = translate("memory", json.language).capitalize() + " : " + FIOITaskMetaData.limits.memory["*"] + "ko<br />";
         }
         
         return time + memory;
@@ -350,21 +351,21 @@ task.load = function(callback)
         initViews();
     }
     
-    if (metadata.tests != null)
-    for (var i=0; i<metadata.tests.length; i++)
+    if (FIOITaskMetaData.tests != null)
+    for (var i=0; i<FIOITaskMetaData.tests.length; i++)
     {
       var act = $("<div></div>");
       var input = $("<pre></pre>");
       var output = $("<pre></pre>");
       
       waiting += 2;
-      $.get("tests/" + metadata.tests[i] + ".in")
+      $.get("tests/" + FIOITaskMetaData.tests[i] + ".in")
        .done(doneCB(input))
-       .fail(failCB("test/" + metadata.tests[i] + ".in"))
+       .fail(failCB("test/" + FIOITaskMetaData.tests[i] + ".in"))
        .always(alwaysCB);
-      $.get("tests/" + metadata.tests[i] + ".out")
+      $.get("tests/" + FIOITaskMetaData.tests[i] + ".out")
        .done(doneCB(output))
-       .fail(failCB("test/" + metadata.tests[i] + ".out"))
+       .fail(failCB("test/" + FIOITaskMetaData.tests[i] + ".out"))
        .always(alwaysCB);
       
       act.append($("<div></div>").append(input));
@@ -376,16 +377,16 @@ task.load = function(callback)
     
     var sources = $('<script id="sources" type="text/template"></script>');
     
-    if (metadata.sources != null)
-    for (var iGroup in metadata.sources)
+    if (FIOITaskMetaData.sources != null)
+    for (var iGroup in FIOITaskMetaData.sources)
     {
       var tmp = $("<div id='sources-" + iGroup + "'></div>");
       
-      for (var iSource=0; iSource<metadata.sources[iGroup].length; iSource++)
+      for (var iSource=0; iSource<FIOITaskMetaData.sources[iGroup].length; iSource++)
       {
-        var tab = metadata.sources[iGroup][iSource].split(".");
+        var tab = FIOITaskMetaData.sources[iGroup][iSource].split(".");
         var lang = Language.languageFromExtension(tab[tab.length-1]);
-        var id = metadata.sources[iGroup][iSource];
+        var id = FIOITaskMetaData.sources[iGroup][iSource];
         var act = $("<" + Language.baliseFromLanguage(lang) + "></" + Language.baliseFromLanguage(lang) + ">");
         
         waiting++;
@@ -409,12 +410,12 @@ task.load = function(callback)
   {
     var tests = $('<script id="tests" type="text/template"></script>');
     
-    if (metadata.tests != null)
-    for (var i=0; i<metadata.tests.length; i++)
+    if (FIOITaskMetaData.tests != null)
+    for (var i=0; i<FIOITaskMetaData.tests.length; i++)
     {
       var tmp = $("<div></div>");
-      tmp.append("<div><iframe src='tests/" + metadata.tests[i] + ".in'></iframe></div>");
-      tmp.append("<div><iframe src='tests/" + metadata.tests[i] + ".out'></iframe><div>");
+      tmp.append("<div><iframe src='tests/" + FIOITaskMetaData.tests[i] + ".in'></iframe></div>");
+      tmp.append("<div><iframe src='tests/" + FIOITaskMetaData.tests[i] + ".out'></iframe><div>");
       tests.append(tmp);
     }
     
@@ -422,16 +423,16 @@ task.load = function(callback)
     
     var sources = $('<script id="sources" type="text/template"></script>');
     
-    if (metadata.sources != null)
-    for (var iGroup in metadata.sources)
+    if (FIOITaskMetaData.sources != null)
+    for (var iGroup in FIOITaskMetaData.sources)
     {
       var tmp = $("<div id='sources-" + iGroup + "'></div>");
       
-      for (var iSource=0; iSource<metadata.sources[iGroup].length; iSource++)
+      for (var iSource=0; iSource<FIOITaskMetaData.sources[iGroup].length; iSource++)
       {
-        var tab = metadata.sources[iGroup][iSource].split(".");
+        var tab = FIOITaskMetaData.sources[iGroup][iSource].split(".");
         var lang = Language.languageFromExtension(tab[tab.length-1]);
-        var id = metadata.sources[iGroup][iSource];
+        var id = FIOITaskMetaData.sources[iGroup][iSource];
         tmp.append("<div lang='" + lang + "'>" +
                    "<iframe src='sources/" + iGroup + "-" + id + "' width='600' height='400'>" +
                    "</iframe>" +

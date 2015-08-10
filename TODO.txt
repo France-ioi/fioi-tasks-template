@@ -2,3 +2,4 @@
 - [SOURCE:group::id] et [SOURCE::id] ?
 - [VIDEO]
 - Tester sur différents navigateurs
+- use syntaxHighlighter 3.0.9
