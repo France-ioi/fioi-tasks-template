@@ -1,0 +1,4 @@
+- Comment gérer les < (remplacer par &lt; ?)
+- [SOURCE:group::id] et [SOURCE::id] ?
+- [VIDEO]
+- Tester sur différents navigateurs

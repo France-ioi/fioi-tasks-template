@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <script type="text/javascript">
+      var json = {
+        title : "Exemple de sujet",
+        author : "Simon Mauras",
+        language : "fr",
+        baseUrl : "http://www.france-ioi.org/dataSite/site/"
+      }
+    </script>
+    
+    <title>Exemple de sujet</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    
+    <link type="text/css" rel="stylesheet" href="http://france-ioi.org/ext/SyntaxHighlighter/styles/shCoreFranceIoi.css" />
+    <link type="text/css" rel="stylesheet" href="http://code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
+    <link type="text/css" rel="stylesheet" href="../style.css">
+    
+    <script src="metadata.js" type="text/javascript"></script>
+    <script class="remove" src="../lib.js" type="text/javascript"></script>
+  </head>
+  <body>
+    <script id="task" type="text/template">
+      <h1>Statement</h1>
+      l'énoncé...
+      <p>
+      <img src="banner_algo.jpg">
+      </p>
+      <ul>
+      <li><a href="#task">lien 1</a>
+      <li><a href="http://google.fr">lien 2</a>
+      <li><a href="banner_algo.jpg">lien 3</a>
+      </ul>
+      <ocaml>
+      let x = 3 + 4 in
+      print_int x;;
+      </ocaml>
+      
+      <select_prog_tag>
+      <c_cpp>
+      tralala();
+      </c_cpp>
+      <ocaml>
+      tralala ();;
+      </ocaml>
+      </select_prog_tag>
+      
+      <specific lang="java, c, cpp ,jvs">
+      <pseudo>abracadabra ();</pseudo>
+      </specific>
+
+      <h1>Constraints</h1>
+      <ul>
+      <li>contrainte 1</li>
+      <li>contrainte 2</li>
+      <li>...</li>
+      </ul>
+
+      <h1>Input</h1>
+      En entrée on a...
+
+      <h1>Output</h1>
+      En sortie il faut afficher...
+
+      <h1>Comments</h1>
+      Quelques commentaires...
+    </script>
+    <script id="animation" type="text/template">
+      Une animation...
+    </script>
+    <script id="hints" type="text/template">
+      Des indices...
+    </script>
+    <script id="solution" type="text/template">
+      La solution...
+    </script>
+  </body>
+</html>
