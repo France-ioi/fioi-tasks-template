@@ -5,5 +5,6 @@ var FIOITaskMetaData = {
     memory : { "*" : 16000, "python" : 20000 }
   },
   
-  tests : ["id0", "id1"]
+  taskSamples : ["id0"],
+  graderSamples: ["id1"]
 }

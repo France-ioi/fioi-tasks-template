@@ -4,7 +4,7 @@ var PEMInstallationAPIObject = {
 }
 
 var FIOITaskMetaData = {
-  sources : {
+  taskSources : {
     "default" : [ "sol.cpp",  "sol.c",  "sol.java",  "sol.jvs",  "sol.pas",  "sol.py" ]
   }
 };

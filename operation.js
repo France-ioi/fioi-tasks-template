@@ -1,12 +1,135 @@
+(function() {
 'use strict';
+
+var debug = false;
+
+var languageFromFilename = function(filename) {
+  var ext = filename.substr(filename.lastIndexOf('.') + 1);
+  switch (ext) {
+   case "cpp" : return "C++";
+   case "c" : return "C";
+   case "pas" : return "Pascal";
+   case "ml" : return "OCaml";
+   case "java" : return "Java";
+   case "jvs" : return "JavaScool";
+   case "py" : return "Python";
+   default : alert("Unknown extension '" + ext + "'");
+ }
+};
+
+// fetches all the resources from FIOITaskMetaData into PEMInstallationAPIObject
+// calls callback when done
+function fetchResources(FIOITaskMetaData, callback) {
+    var waiting = 1; // number of ajax fetches waiting
+    // the result is an object containing the arrays to concat to 
+    var groupsResources = {task: {}, solution: {}}; // keep track of group -> resource mapping, to add the answerForms
+    // type is 'task' or 'solution'
+    function sourceDone(groupName, sourceFile, type) {
+      return function(answer) {
+         console.log('got '+answer);
+         var groupResource = groupsResources[type][groupName];
+         if (!groupResource) {
+            groupResource = {type: 'answer', name: groupName, answerForms: []};
+            groupsResources[type][groupName] = groupResource;
+            PEMInstallationAPIObject[type].push(groupResource);
+         }
+         console.log(groupsResources);
+         groupResource.answerForms.push({
+            params: {sLangProg: languageFromFilename(sourceFile)},
+            answer: answer
+         });
+      };
+    }
+    var samplesResources = {task: {}, solution: {}}; // keep track of test name -> resource mapping
+    // type is 'task' or 'solution'
+    // direction is 'in' or 'out'
+    function sampleDone(sampleName, type, direction) {
+      return function(sample) {
+         var sampleResource = samplesResources[type][sampleName];
+         if (!sampleResource) {
+            sampleResource = {type: 'sample', name: sampleName};
+            samplesResources[type][sampleName] = sampleResource;
+            PEMInstallationAPIObject[type].push(sampleResource);
+         }
+         sampleResource[direction] = sample;
+      };
+    }
+    function fetchFail(filename) { return function() { alert("Unable to load '" + filename + "'"); }; }
+    function fetchAlways()
+    {
+      waiting = waiting -1;
+      if (!waiting)
+        callback();
+    }
+    
+    var i;
+    if (FIOITaskMetaData.taskSamples) {
+       for (i=0; i<FIOITaskMetaData.taskSamples.length; i++)
+       {
+         waiting += 2;
+         $.get("tests/" + FIOITaskMetaData.taskSamples[i] + ".in")
+          .done(sampleDone(FIOITaskMetaData.taskSamples[i], 'task', 'in'))
+          .fail(fetchFail("test/" + FIOITaskMetaData.taskSamples[i] + ".in"))
+          .always(fetchAlways);
+         $.get("tests/" + FIOITaskMetaData.taskSamples[i] + ".out")
+          .done(sampleDone(FIOITaskMetaData.taskSamples[i], 'task', 'out'))
+          .fail(fetchFail("test/" + FIOITaskMetaData.taskSamples[i] + ".out"))
+          .always(fetchAlways);
+       }
+    }
+    if (FIOITaskMetaData.graderSamples) {
+       for (i=0; i<FIOITaskMetaData.graderSamples.length; i++)
+       {
+         waiting += 2;
+         $.get("tests/" + FIOITaskMetaData.graderSamples[i] + ".in")
+          .done(sampleDone(FIOITaskMetaData.graderSamples[i], 'grader', 'in'))
+          .fail(fetchFail("test/" + FIOITaskMetaData.graderSamples[i] + ".in"))
+          .always(fetchAlways);
+         $.get("tests/" + FIOITaskMetaData.graderSamples[i] + ".out")
+          .done(sampleDone(FIOITaskMetaData.graderSamples[i], 'grader', 'out'))
+          .fail(fetchFail("test/" + FIOITaskMetaData.graderSamples[i] + ".out"))
+          .always(fetchAlways);
+       }
+    }
+    var groupName, iSource, fileName;
+    if (FIOITaskMetaData.taskSources) {
+       for (groupName in FIOITaskMetaData.taskSources)
+       {
+         for (iSource=0; iSource<FIOITaskMetaData.taskSources[groupName].length; iSource++)
+         {
+           waiting++;
+           fileName = FIOITaskMetaData.taskSources[groupName][iSource];
+           $.get("sources/" + groupName + "-" + fileName)
+            .done(sourceDone(groupName, fileName, 'task'))
+            .fail(fetchFail("sources/" + groupName + "-" + fileName))
+            .always(fetchAlways);
+         }
+       }
+   }
+    if (FIOITaskMetaData.solutionSources) {
+       for (groupName in FIOITaskMetaData.solutionSources)
+       {
+         for (iSource=0; iSource<FIOITaskMetaData.solutionSources[groupName].length; iSource++)
+         {
+           waiting++;
+           fileName = FIOITaskMetaData.taskSources[groupName][iSource];
+           $.get("sources/" + groupName + "-" + fileName)
+            .done(sourceDone(groupName, fileName, 'solution'))
+            .fail(fetchFail("sources/" + groupName + "-" + fileName))
+            .always(fetchAlways);
+         }
+       }
+   }
+   fetchAlways();
+}
 
 var task = {};
 
 task.getMetaData = function(callback)
 {
-  if (typeof json === 'undefined')
-    json = {};
-  callback(json);
+  if (typeof PEMInstallationAPIObject === 'undefined')
+    PEMInstallationAPIObject = {};
+  callback(PEMInstallationAPIObject);
 };
 
 task.getViews = function(callback) {
@@ -36,12 +159,12 @@ task.load = function(views, callback) // TODO: handle views
 {
   var sSelectedLanguage = "C++"; // TODO : Parametre lors du chargement
   
-  if (typeof json == 'undefined')
-    json = {};
-  if (typeof json.language == 'undefined')
-    json.language = "fr";
-  if (typeof json.baseUrl == 'undefined')
-    json.baseUrl = "";
+  if (typeof PEMInstallationAPIObject == 'undefined')
+    PEMInstallationAPIObject = {};
+  if (typeof PEMInstallationAPIObject.language == 'undefined')
+    PEMInstallationAPIObject.language = "fr";
+  if (typeof PEMInstallationAPIObject.baseUrl == 'undefined')
+    PEMInstallationAPIObject.baseUrl = "";
   
   var initViews = function()
   {
@@ -115,14 +238,14 @@ task.load = function(views, callback) // TODO: handle views
       dom.find("img,script").each(function() {
         var url = $(this).attr("src");
         if (url.search("http://") == -1)
-          $(this).attr("src", json.baseUrl + "/" + url);
+          $(this).attr("src", PEMInstallationAPIObject.baseUrl + "/" + url);
       });
       dom.find("a").each(function() {
         var url = $(this).attr("href");
         if (url.search("http://") == -1)
         {
           if (url.search("#") !== 0)
-            $(this).attr("href", json.baseUrl + "/" + url);
+            $(this).attr("href", PEMInstallationAPIObject.baseUrl + "/" + url);
         }
         else
         {
@@ -228,14 +351,14 @@ task.load = function(views, callback) // TODO: handle views
         if (typeof FIOITaskMetaData.limits != "undefined")
         {
           if (typeof FIOITaskMetaData.limits.time[sSelectedLanguage] != "undefined")
-            time = translate("time", json.language).capitalize() + " : " + FIOITaskMetaData.limits.time[sSelectedLanguage] + "s<br />";
+            time = translate("time", PEMInstallationAPIObject.language).capitalize() + " : " + FIOITaskMetaData.limits.time[sSelectedLanguage] + "s<br />";
           else if (typeof FIOITaskMetaData.limits.time["*"] != "undefined")
-            time = translate("time", json.language).capitalize() + " : " + FIOITaskMetaData.limits.time["*"] + "s<br />";
+            time = translate("time", PEMInstallationAPIObject.language).capitalize() + " : " + FIOITaskMetaData.limits.time["*"] + "s<br />";
           
           if (typeof FIOITaskMetaData.limits.memory[sSelectedLanguage] != "undefined")
-            memory = translate("memory", json.language).capitalize() + " : " + FIOITaskMetaData.limits.memory[sSelectedLanguage] + "ko<br />";
+            memory = translate("memory", PEMInstallationAPIObject.language).capitalize() + " : " + FIOITaskMetaData.limits.memory[sSelectedLanguage] + "ko<br />";
           else if (typeof FIOITaskMetaData.limits.memory["*"] != "undefined")
-            memory = translate("memory", json.language).capitalize() + " : " + FIOITaskMetaData.limits.memory["*"] + "ko<br />";
+            memory = translate("memory", PEMInstallationAPIObject.language).capitalize() + " : " + FIOITaskMetaData.limits.memory["*"] + "ko<br />";
         }
         
         return time + memory;
@@ -246,10 +369,10 @@ task.load = function(views, callback) // TODO: handle views
         var result = "";
         
         $("#tests").children().each( function() {
-          result += translate("input", json.language).capitalize() + " :<br />";
+          result += translate("input", PEMInstallationAPIObject.language).capitalize() + " :<br />";
           result += $(this.children[0]).html();
           result += "<br />";
-          result += translate("output", json.language).capitalize() + " :<br />";
+          result += translate("output", PEMInstallationAPIObject.language).capitalize() + " :<br />";
           result += $(this.children[1]).html();
           result += "<br />";
         });
@@ -268,37 +391,37 @@ task.load = function(views, callback) // TODO: handle views
       
       if (categories.limits)
       {
-        result += "<h3>" + translate("limits", json.language).toUpperCase() + "</h3>";
+        result += "<h3>" + translate("limits", PEMInstallationAPIObject.language).toUpperCase() + "</h3>";
         result += categories.limits;
       }
       
       if (categories.constraints)
       {
-        result += "<h3>" + translate("constraints", json.language).toUpperCase() + "</h3>";
+        result += "<h3>" + translate("constraints", PEMInstallationAPIObject.language).toUpperCase() + "</h3>";
         result += transformHtml(categories.constraints);
       }
       
       if (categories.input)
       {
-        result += "<h3>" + translate("input", json.language).toUpperCase() + "</h3>";
+        result += "<h3>" + translate("input", PEMInstallationAPIObject.language).toUpperCase() + "</h3>";
         result += transformHtml(categories.input);
       }
       
       if (categories.output)
       {
-        result += "<h3>" + translate("output", json.language).toUpperCase() + "</h3>";
+        result += "<h3>" + translate("output", PEMInstallationAPIObject.language).toUpperCase() + "</h3>";
         result += transformHtml(categories.output);
       }
       
       if (categories.tests)
       {
-        result += "<h3>" + translate("examples", json.language).toUpperCase() + "</h3>";
+        result += "<h3>" + translate("examples", PEMInstallationAPIObject.language).toUpperCase() + "</h3>";
         result += categories.tests;
       }
       
       if (categories.comments)
       {
-        result += "<h3>" + translate("comments", json.language).toUpperCase() + "</h3>";
+        result += "<h3>" + translate("comments", PEMInstallationAPIObject.language).toUpperCase() + "</h3>";
         result += transformHtml(addSources(categories.comments));
       }
       
@@ -345,6 +468,9 @@ task.load = function(views, callback) // TODO: handle views
   
   var initLoadAjax = function()
   {
+    fetchResources(FIOITaskMetaData, function() {
+      console.log(PEMInstallationAPIObject);
+    });
     var tests = $('<script id="tests" type="text/template"></script>');
     var waiting = 1;
     function doneCB(x) { return function(data) { x.text(data); }; }
@@ -352,7 +478,7 @@ task.load = function(views, callback) // TODO: handle views
     function alwaysCB()
     {
       waiting--;
-      if (waiting)
+      if (!waiting)
         initViews();
     }
     
@@ -458,3 +584,7 @@ task.load = function(views, callback) // TODO: handle views
   else
     initLoadIframe();
 };
+
+window.task = task;
+
+})();
