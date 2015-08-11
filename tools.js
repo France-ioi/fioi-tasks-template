@@ -1,3 +1,5 @@
+'use strict';
+
 var Language = {
 
   baliseFromLanguage : function(x)
@@ -62,17 +64,17 @@ function translate(s, lang)
     constraints : { fr : "contraintes", en : "constraints" },
     examples :    { fr : "exempes", en : "examples" },
     comments :    { fr : "commentaires", en : "comments" }
-  }
-  
-  if (translations[s] == undefined || translations[s][lang] == undefined)
+  };
+
+  if (!translations[s] || !translations[s][lang])
   {
     alert("Unable to translate '" + s + "' in " + lang);
     return "";
   }
-  
+
   return translations[s][lang];
 }
 
 String.prototype.capitalize = function() {
     return this.charAt(0).toUpperCase() + this.slice(1);
-}
+};
