@@ -25,46 +25,55 @@
     </script>
   </head>
   <body>
+
     <div class="task">
-      <h1>Statement</h1>
-      Task main statement
-      <p>
-      <img src="task-image.jpg">
-      </p>
-      
-      <pre class="code lang-c-cpp">
-         foo();
-      </pre>
-      <pre class="code lang-ocaml">
-         foo ();;
-      </pre>
-      
-      <div class="specific" data-lang="java, c, cpp ,jvs">
-         <pre class="code lang-all">bar ();</pre>
+
+      <!-- Limits specified in metadata.js will be automatically inserted here -->
+
+      <div class="task-statement">
+         <p>Task main statement, mandatory. You are currently using {LANGPROG}, lowercase {LANGPROG_L}.</p>
+         
+         <img src="task-image.jpg">
+         
+         <pre class="code lang-c-cpp">
+            this_is_c_or_cpp_code();
+         </pre>
+         <pre class="code lang-ocaml">
+            this_is_ocaml_code ();;
+         </pre>
+         
+         <div class="specific" data-lang="java, c, cpp ,jvs">
+            <pre class="code lang-all">this_is_specific_to_c_cpp_java_and_javascool ();</pre>
+         </div>
       </div>
 
-      <h1>Constraints</h1>
-      <ul>
-      <li>constraint 1</li>
-      <li>constraint 2</li>
-      <li>...</li>
-      </ul>
+      <div class="task-constraints">
+         <p>This optional block is for additional constraints (in addition to cpu, memory, time, etc. limits):</p>
+         <ul>
+         <li>constraint 1</li>
+         <li>constraint 2</li>
+         <li>...</li>
+         </ul>
+      </div>
 
-      <h1>Input</h1>
-      Suppose the input is...
+      <div class="task-comments">
+         Optional. You can use it to give an example of code using the library:
+         <div class="codeTabs source task-source" data-group="templateSource"></div>
 
-      <h1>Output</h1>
-      The the output should be...
+         <div id="animation-0" class="animation">
+           This animation demonstrates the use of previous source code. You can include css and js.
+         </div>
 
-      <h1>Comments</h1>
-      Some comments...
-      
-      <div id="animation-0" class="animation">
-        An animation
       </div>
     </div>
+
+    <div id="editor">
+       You can add something on top of the editor (the editor block is not mandatory, editor will appear even if absent)
+       <!-- Editor will be inserted here -->
+    </div>
+
     <div id="hints">
-      Here are a few hints:
+      A sentence to introduce the different hints (the "hints" block is not mandatory).
       <div id="hint-1" class="hint">
         The first hint
       </div>
@@ -72,12 +81,18 @@
         The second hint
       </div>
     </div>
+
     <div id="solution">
       The solution in the current language:
-      <pre class="source solution-source" data-group="firstSource"></pre>
+      <div class="source solution-source" data-group="firstSource"></div>
       
-      The solutions in all languages:
-      <div class="codeTabs source solution-source" data-group="firstSource"></div>
+      The solutions in all languages (with tabs):
+      <div class="codeTabs source solution-source" data-group="firstSource">
+        <pre class="code lang-pseudo">
+          This will be an additional tab with pseudo-code
+        </pre>
+      </div>
     </div>
+
   </body>
 </html>
