@@ -17,12 +17,16 @@ var languageFromFilename = function(filename) {
  }
 };
 
-// fetches all the resources from FIOITaskMetaData into PEMInstallationAPIObject
+// fills all the resources from FIOITaskMetaData into PEMInstallationAPIObject
 // calls callback when done
-function fetchResources(FIOITaskMetaData, callback) {
+// urlMode is true if we just want the url, not the content
+function fillResources(FIOITaskMetaData, callback, urlMode) {
     var waiting = 1; // number of ajax fetches waiting
     // the result is an object containing the arrays to concat to 
     var groupsResources = {task: {}, solution: {}}; // keep track of group -> resource mapping, to add the answerForms
+    //
+    // ajax callback factories
+    //
     // type is 'task' or 'solution'
     function sourceDone(groupName, sourceFile, type) {
       return function(answer) {
@@ -33,10 +37,9 @@ function fetchResources(FIOITaskMetaData, callback) {
             groupsResources[type][groupName] = groupResource;
             PEMInstallationAPIObject[type].push(groupResource);
          }
-         console.log(groupsResources);
          groupResource.answerForms.push({
             params: {sLangProg: languageFromFilename(sourceFile)},
-            answer: answer
+            answerContent: answer
          });
       };
     }
@@ -62,64 +65,77 @@ function fetchResources(FIOITaskMetaData, callback) {
         callback();
     }
     
-    var i;
-    if (FIOITaskMetaData.taskSamples) {
-       for (i=0; i<FIOITaskMetaData.taskSamples.length; i++)
-       {
+    //
+    // actual filling
+    //
+    // type is 'task' or 'grader'
+    function fillSamples(samples, type) {
+       if (!samples) return;
+       for (var i=0; i<samples.length; i++) {
+         if (!urlMode) {
          waiting += 2;
-         $.get("tests/" + FIOITaskMetaData.taskSamples[i] + ".in")
-          .done(sampleDone(FIOITaskMetaData.taskSamples[i], 'task', 'in'))
-          .fail(fetchFail("test/" + FIOITaskMetaData.taskSamples[i] + ".in"))
+         $.get("tests/" + samples[i] + ".in")
+          .done(sampleDone(samples[i], type, 'in'))
+          .fail(fetchFail("test/" + samples[i] + ".in"))
           .always(fetchAlways);
-         $.get("tests/" + FIOITaskMetaData.taskSamples[i] + ".out")
-          .done(sampleDone(FIOITaskMetaData.taskSamples[i], 'task', 'out'))
-          .fail(fetchFail("test/" + FIOITaskMetaData.taskSamples[i] + ".out"))
+         $.get("tests/" + samples[i] + ".out")
+          .done(sampleDone(samples[i], 'task', 'out'))
+          .fail(fetchFail("test/" + samples[i] + ".out"))
           .always(fetchAlways);
-       }
-    }
-    if (FIOITaskMetaData.graderSamples) {
-       for (i=0; i<FIOITaskMetaData.graderSamples.length; i++)
-       {
-         waiting += 2;
-         $.get("tests/" + FIOITaskMetaData.graderSamples[i] + ".in")
-          .done(sampleDone(FIOITaskMetaData.graderSamples[i], 'grader', 'in'))
-          .fail(fetchFail("test/" + FIOITaskMetaData.graderSamples[i] + ".in"))
-          .always(fetchAlways);
-         $.get("tests/" + FIOITaskMetaData.graderSamples[i] + ".out")
-          .done(sampleDone(FIOITaskMetaData.graderSamples[i], 'grader', 'out'))
-          .fail(fetchFail("test/" + FIOITaskMetaData.graderSamples[i] + ".out"))
-          .always(fetchAlways);
-       }
-    }
-    var groupName, iSource, fileName;
-    if (FIOITaskMetaData.taskSources) {
-       for (groupName in FIOITaskMetaData.taskSources)
-       {
-         for (iSource=0; iSource<FIOITaskMetaData.taskSources[groupName].length; iSource++)
-         {
-           waiting++;
-           fileName = FIOITaskMetaData.taskSources[groupName][iSource];
-           $.get("sources/" + groupName + "-" + fileName)
-            .done(sourceDone(groupName, fileName, 'task'))
-            .fail(fetchFail("sources/" + groupName + "-" + fileName))
-            .always(fetchAlways);
+         } else {
+            PEMInstallationAPIObject[type].push({
+               type: 'sample',
+               name: samples[i],
+               inUrl: "test/" + samples[i] + ".in",
+               outUrl: "test/" + samples[i] + ".out"
+            });
          }
        }
-   }
-    if (FIOITaskMetaData.solutionSources) {
-       for (groupName in FIOITaskMetaData.solutionSources)
+    }
+
+    // type is 'task', 'solution' or 'hint', subtype is null for task and solution, and the hint number for hints
+    function fillSources(sources, type, subtype) {
+       if(!sources) return;
+       if (!PEMInstallationAPIObject[type][subtype]) {
+          PEMInstallationAPIObject[type][subtype] = [];
+       }
+       for (var groupName in sources)
        {
-         for (iSource=0; iSource<FIOITaskMetaData.solutionSources[groupName].length; iSource++)
+         var resource = {type: 'source', name: groupName, answerForms: []};
+         for (var iSource=0; iSource<sources[groupName].length; iSource++)
          {
-           waiting++;
-           fileName = FIOITaskMetaData.taskSources[groupName][iSource];
-           $.get("sources/" + groupName + "-" + fileName)
-            .done(sourceDone(groupName, fileName, 'solution'))
-            .fail(fetchFail("sources/" + groupName + "-" + fileName))
-            .always(fetchAlways);
+           var fileName = sources[groupName][iSource];
+           if (!urlMode) {
+              waiting++;
+              $.get("sources/" + groupName + "-" + fileName)
+               .done(sourceDone(groupName, fileName, type, subtype))
+               .fail(fetchFail("sources/" + groupName + "-" + fileName))
+               .always(fetchAlways);
+           } else {
+              resource.answerForms.push({
+               params: {sLangProg: languageFromFilename(fileName)},
+               answerUrl: "sources/" + groupName + "-" + fileName
+              });
+           }
+         }
+         if (urlMode) {
+            if (subtype) {
+               PEMInstallationAPIObject[type][subtype].push(resource);
+            } else {
+               PEMInstallationAPIObject[type].push(resource);
+            }
          }
        }
-   }
+    }
+
+    fillSamples(FIOITaskMetaData.taskSamples, 'task');
+    fillSamples(FIOITaskMetaData.graderSamples, 'grader');
+    fillSources(FIOITaskMetaData.taskSources, 'task');
+    fillSources(FIOITaskMetaData.solutionSources, 'solution');
+    for (var hintNum in FIOITaskMetaData.hintsSources) {
+       fillSources(FIOITaskMetaData.hintsSources[hintNum], 'hint', hintNum);
+    }
+
    fetchAlways();
 }
 
@@ -468,9 +484,9 @@ task.load = function(views, callback) // TODO: handle views
   
   var initLoadAjax = function()
   {
-    fetchResources(FIOITaskMetaData, function() {
+    fillResources(FIOITaskMetaData, function() {
       console.log(PEMInstallationAPIObject);
-    });
+    }, true);
     var tests = $('<script id="tests" type="text/template"></script>');
     var waiting = 1;
     function doneCB(x) { return function(data) { x.text(data); }; }
