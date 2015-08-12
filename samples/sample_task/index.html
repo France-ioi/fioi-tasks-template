@@ -2,16 +2,7 @@
 <html>
   <head>
     <meta charset="utf-8">
-    <script type="text/javascript">
-      var PEMInstallationAPIObject = {
-        title : "Exemple de sujet",
-        author : "Simon Mauras",
-        language : "fr",
-        baseUrl : "http://www.france-ioi.org/dataSite/site/"
-      }
-    </script>
-    
-    <title>Exemple de sujet</title>
+    <title>Sample Task</title>
     <link type="text/css" rel="stylesheet" href="http://france-ioi.org/ext/SyntaxHighlighter/styles/shCoreFranceIoi.css" />
     <link type="text/css" rel="stylesheet" href="../../modules/ext/jquery-ui/1.10/jquery-ui.css" id="http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css">
     <link type="text/css" rel="stylesheet" href="../../style.css">
@@ -24,61 +15,69 @@
     <script class="module" src="../../tools.js" id="fioi-tools.js"></script>
     <script src="metadata.js" type="text/javascript" class="remove"></script>
     <script class="remove" type="text/javascript" src="../../modules/integrationAPI.01/official/miniPlatform.js" id="http://www.france-ioi.org/modules/integrationAPI.01/official/miniPlatform.js"></script>
+    <script type="text/javascript" class="remove">
+      var PEMInstallationAPIObject = {
+        title : "Sample task",
+        author : "France IOI",
+        language : "en",
+        baseUrl : "https://github.com/France-ioi/fioi-tasks-template"
+      }
+    </script>
   </head>
   <body>
-    <script id="task" type="text/template" class="remove">
+    <div class="task">
       <h1>Statement</h1>
-      l'énoncé...
+      Task main statement
       <p>
-      <img src="banner_algo.jpg">
+      <img src="task-image.jpg">
       </p>
-      <ul>
-      <li><a href="#task">lien 1</a>
-      <li><a href="http://google.fr">lien 2</a>
-      <li><a href="banner_algo.jpg">lien 3</a>
-      </ul>
-      <ocaml>
-      let x = 3 + 4 in
-      print_int x;;
-      </ocaml>
       
-      <select_prog_tag>
-      <c_cpp>
-      tralala();
-      </c_cpp>
-      <ocaml>
-      tralala ();;
-      </ocaml>
-      </select_prog_tag>
+      <pre class="code lang-c-cpp">
+         foo();
+      </pre>
+      <pre class="code lang-ocaml">
+         foo ();;
+      </pre>
       
-      <specific lang="java, c, cpp ,jvs">
-      <pseudo>abracadabra ();</pseudo>
-      </specific>
+      <div class="specific" data-lang="java, c, cpp ,jvs">
+         <pre class="code lang-all">bar ();</pre>
+      </div>
 
       <h1>Constraints</h1>
       <ul>
-      <li>contrainte 1</li>
-      <li>contrainte 2</li>
+      <li>constraint 1</li>
+      <li>constraint 2</li>
       <li>...</li>
       </ul>
 
       <h1>Input</h1>
-      En entrée on a...
+      Suppose the input is...
 
       <h1>Output</h1>
-      En sortie il faut afficher...
+      The the output should be...
 
       <h1>Comments</h1>
-      Quelques commentaires...
-    </script>
-    <script id="animation" type="text/template" class="remove">
-      Une animation...
-    </script>
-    <script id="hints" type="text/template" class="remove">
-      Des indices...
-    </script>
-    <script id="solution" type="text/template" class="remove">
-      La solution...
-    </script>
+      Some comments...
+      
+      <div id="animation-0" class="animation">
+        An animation
+      </div>
+    </div>
+    <div id="hints">
+      Here are a few hints:
+      <div id="hint-1" class="hint">
+        The first hint
+      </div>
+      <div id="hint-2" class="hint">
+        The second hint
+      </div>
+    </div>
+    <div id="solution">
+      The solution in the current language:
+      <pre class="source solution-source" data-group="firstSource"></pre>
+      
+      The solutions in all languages:
+      <div class="codeTabs source solution-source" data-group="firstSource"></div>
+    </div>
   </body>
 </html>
