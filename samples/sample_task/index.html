@@ -13,9 +13,9 @@
     <script class="proxy module" type="text/javascript" src="../../modules/integrationAPI.01/official/platform-pr.js" id="http://www.france-ioi.org/modules/integrationAPI.01/official/platform-pr.js"></script>
     <script class="module" src="../../operation.js" id="fioi-operation.js"></script>
     <script class="module" src="../../tools.js" id="fioi-tools.js"></script>
-    <script src="metadata.js" type="text/javascript" class="remove"></script>
     <script class="remove" type="text/javascript" src="../../modules/integrationAPI.01/official/miniPlatform.js" id="http://www.france-ioi.org/modules/integrationAPI.01/official/miniPlatform.js"></script>
     <script type="text/javascript" class="remove">
+      // general metadata conforming the Bebras Installation API Documentation
       var PEMInstallationAPIObject = {
         // title is automatically fetched from the <title> markup
         id : 'FranceIOI/Samples/GitTaskSample',
@@ -24,6 +24,19 @@
         language : "en",
         version: "0.1",
         baseUrl : "https://github.com/France-ioi/fioi-tasks-template"
+      }
+
+      // Metadata specific to the FranceIOI tasks
+      var FIOITaskMetaData = {
+        limits : {
+          time : { "*" : 2, "cpp" : 1 },
+          memory : { "*" : 16000, "python" : 20000 }
+        },
+        solutionSources : {
+          "firstSource" : [ "sol.cpp",  "sol.c",  "sol.java",  "sol.jvs",  "sol.pas",  "sol.py" ]
+        },
+        taskSamples : ["id0"],
+        graderSamples: ["id1"]
       }
     </script>
   </head>
