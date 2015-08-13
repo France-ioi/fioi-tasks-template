@@ -23,7 +23,7 @@ var extensionToLanguage = {
    java: 'java',
    jvs:  'javascool',
    py:   'python'
-}
+};
 
 // fills all the resources from FIOITaskMetaData into PEMInstallationAPIObject
 // calls callback when done
@@ -32,7 +32,6 @@ function fillResources(FIOITaskMetaData, PEMInstallationAPIObject,
    callback, urlMode) {
    var waiting = 1; // number of ajax fetches waiting
    // the result is an object containing the arrays to concat to
-   var res = {};
    // keep track of group -> resource mapping, to add the answerVersions
    var groupsResources = {
       task: {},
@@ -146,7 +145,7 @@ function fillResources(FIOITaskMetaData, PEMInstallationAPIObject,
             } else {
                resource.answerVersions.push({
                   params: {
-                     sLangProg: extensionToLanguage[sourceFile.substr(sourceFile.lastIndexOf('.') + 1)]
+                     sLangProg: extensionToLanguage[fileName.substr(fileName.lastIndexOf('.') + 1)]
                   },
                   answerUrl: "sources/" + groupName + "-" +
                      fileName
@@ -289,7 +288,7 @@ var langToPrint = {
    'javascool': 'JavaScool',
    'ocaml': 'OCaml',
    'pseudo': 'Pseudo-code'
-}
+};
 
 function includeSourceTabs(resources, currentLang, urlMode) {
    $('.all-sources').each(function() {

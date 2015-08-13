@@ -13,7 +13,8 @@
       "TreeView": true,
       "objectHasProperties": true,
       "PEMInstallationAPIObject": true,
-      "FIOITaskMetaData": true
+      "FIOITaskMetaData": true,
+      "SyntaxHighlighter": true
    },
    "trailing": true,
    "undef":true,
