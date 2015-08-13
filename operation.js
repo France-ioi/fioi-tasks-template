@@ -160,7 +160,7 @@ task.getViews = function(callback) {
 
 task.showViews = function(views, callback)
 {
-   $.each(['task', 'animation', 'hints', 'solution'], function(i, view) {
+   $.each(['task', 'hints', 'solution'], function(i, view) {
       if (view in views)
         $('#view-' + view).show();
       else
