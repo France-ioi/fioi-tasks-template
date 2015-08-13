@@ -20,9 +20,10 @@ var languageFromFilename = function(filename) {
 // fills all the resources from FIOITaskMetaData into PEMInstallationAPIObject
 // calls callback when done
 // urlMode is true if we just want the url, not the content
-function fillResources(FIOITaskMetaData, callback, urlMode) {
+function fillResources(FIOITaskMetaData, PEMInstallationAPIObject, callback, urlMode) {
     var waiting = 1; // number of ajax fetches waiting
-    // the result is an object containing the arrays to concat to 
+    // the result is an object containing the arrays to concat to
+    var res = {};
     var groupsResources = {task: {}, solution: {}}; // keep track of group -> resource mapping, to add the answerForms
     //
     // ajax callback factories
@@ -30,7 +31,6 @@ function fillResources(FIOITaskMetaData, callback, urlMode) {
     // type is 'task' or 'solution'
     function sourceDone(groupName, sourceFile, type) {
       return function(answer) {
-         console.log('got '+answer);
          var groupResource = groupsResources[type][groupName];
          if (!groupResource) {
             groupResource = {type: 'answer', name: groupName, answerForms: []};
@@ -139,48 +139,11 @@ function fillResources(FIOITaskMetaData, callback, urlMode) {
    fetchAlways();
 }
 
-var task = {};
-
-task.getMetaData = function(callback)
-{
-  if (typeof PEMInstallationAPIObject === 'undefined')
-    PEMInstallationAPIObject = {};
-  callback(PEMInstallationAPIObject);
-};
-
-task.getViews = function(callback) {
-  var views = {
-    task: {},
-    animation : {},
-    hints : {},
-    solution: {}
-  };
-  callback(views);
-};
-
-task.showViews = function(views, callback)
-{
-   $.each(['task', 'hints', 'solution'], function(i, view) {
-      if (view in views)
-        $('#view-' + view).show();
-      else
-        $('#view-' + view).hide();
-   });
-   callback();
-};
-
 task.printViewChooser = true; // miniPlatform shows view chooser
 
 task.load = function(views, callback) // TODO: handle views
 {
   var sSelectedLanguage = "C++"; // TODO : Parametre lors du chargement
-  
-  if (typeof PEMInstallationAPIObject == 'undefined')
-    PEMInstallationAPIObject = {};
-  if (typeof PEMInstallationAPIObject.language == 'undefined')
-    PEMInstallationAPIObject.language = "fr";
-  if (typeof PEMInstallationAPIObject.baseUrl == 'undefined')
-    PEMInstallationAPIObject.baseUrl = "";
   
   var initViews = function()
   {
@@ -250,25 +213,26 @@ task.load = function(views, callback) // TODO: handle views
       };
       
       var dom = $("<div>").html(s);
-      
-      dom.find("img,script").each(function() {
-        var url = $(this).attr("src");
-        if (url.search("http://") == -1)
-          $(this).attr("src", PEMInstallationAPIObject.baseUrl + "/" + url);
-      });
-      dom.find("a").each(function() {
-        var url = $(this).attr("href");
-        if (url.search("http://") == -1)
-        {
-          if (url.search("#") !== 0)
-            $(this).attr("href", PEMInstallationAPIObject.baseUrl + "/" + url);
-        }
-        else
-        {
-          if (url.search("france-ioi.org") == -1)
-            $(this).attr("target", "_blank");
-        }
-      });
+
+// TODO: why all that?
+//      dom.find("img,script").each(function() {
+//        var url = $(this).attr("src");
+//        if (url.search("http://") == -1)
+//          $(this).attr("src", PEMInstallationAPIObject.baseUrl + "/" + url);
+//      });
+//      dom.find("a").each(function() {
+//        var url = $(this).attr("href");
+//        if (url.search("http://") == -1)
+//        {
+//          if (url.search("#") !== 0)
+//            $(this).attr("href", PEMInstallationAPIObject.baseUrl + "/" + url);
+//        }
+//        else
+//        {
+//          if (url.search("france-ioi.org") == -1)
+//            $(this).attr("target", "_blank");
+//        }
+//      });
       
       var tagSelected = "<" + Language.baliseFromLanguage(sSelectedLanguage) + ">";
       
@@ -367,14 +331,14 @@ task.load = function(views, callback) // TODO: handle views
         if (typeof FIOITaskMetaData.limits != "undefined")
         {
           if (typeof FIOITaskMetaData.limits.time[sSelectedLanguage] != "undefined")
-            time = translate("time", PEMInstallationAPIObject.language).capitalize() + " : " + FIOITaskMetaData.limits.time[sSelectedLanguage] + "s<br />";
+            time = translate("time", PEMTaskMetaData.language).capitalize() + " : " + FIOITaskMetaData.limits.time[sSelectedLanguage] + "s<br />";
           else if (typeof FIOITaskMetaData.limits.time["*"] != "undefined")
-            time = translate("time", PEMInstallationAPIObject.language).capitalize() + " : " + FIOITaskMetaData.limits.time["*"] + "s<br />";
+            time = translate("time", PEMTaskMetaData.language).capitalize() + " : " + FIOITaskMetaData.limits.time["*"] + "s<br />";
           
           if (typeof FIOITaskMetaData.limits.memory[sSelectedLanguage] != "undefined")
-            memory = translate("memory", PEMInstallationAPIObject.language).capitalize() + " : " + FIOITaskMetaData.limits.memory[sSelectedLanguage] + "ko<br />";
+            memory = translate("memory", PEMTaskMetaData.language).capitalize() + " : " + FIOITaskMetaData.limits.memory[sSelectedLanguage] + "ko<br />";
           else if (typeof FIOITaskMetaData.limits.memory["*"] != "undefined")
-            memory = translate("memory", PEMInstallationAPIObject.language).capitalize() + " : " + FIOITaskMetaData.limits.memory["*"] + "ko<br />";
+            memory = translate("memory", PEMTaskMetaData.language).capitalize() + " : " + FIOITaskMetaData.limits.memory["*"] + "ko<br />";
         }
         
         return time + memory;
@@ -385,10 +349,10 @@ task.load = function(views, callback) // TODO: handle views
         var result = "";
         
         $("#tests").children().each( function() {
-          result += translate("input", PEMInstallationAPIObject.language).capitalize() + " :<br />";
+          result += translate("input", PEMTaskMetaData.language).capitalize() + " :<br />";
           result += $(this.children[0]).html();
           result += "<br />";
-          result += translate("output", PEMInstallationAPIObject.language).capitalize() + " :<br />";
+          result += translate("output", PEMTaskMetaData.language).capitalize() + " :<br />";
           result += $(this.children[1]).html();
           result += "<br />";
         });
@@ -407,37 +371,37 @@ task.load = function(views, callback) // TODO: handle views
       
       if (categories.limits)
       {
-        result += "<h3>" + translate("limits", PEMInstallationAPIObject.language).toUpperCase() + "</h3>";
+        result += "<h3>" + translate("limits", PEMTaskMetaData.language).toUpperCase() + "</h3>";
         result += categories.limits;
       }
       
       if (categories.constraints)
       {
-        result += "<h3>" + translate("constraints", PEMInstallationAPIObject.language).toUpperCase() + "</h3>";
+        result += "<h3>" + translate("constraints", PEMTaskMetaData.language).toUpperCase() + "</h3>";
         result += transformHtml(categories.constraints);
       }
       
       if (categories.input)
       {
-        result += "<h3>" + translate("input", PEMInstallationAPIObject.language).toUpperCase() + "</h3>";
+        result += "<h3>" + translate("input", PEMTaskMetaData.language).toUpperCase() + "</h3>";
         result += transformHtml(categories.input);
       }
       
       if (categories.output)
       {
-        result += "<h3>" + translate("output", PEMInstallationAPIObject.language).toUpperCase() + "</h3>";
+        result += "<h3>" + translate("output", PEMTaskMetaData.language).toUpperCase() + "</h3>";
         result += transformHtml(categories.output);
       }
       
       if (categories.tests)
       {
-        result += "<h3>" + translate("examples", PEMInstallationAPIObject.language).toUpperCase() + "</h3>";
+        result += "<h3>" + translate("examples", PEMTaskMetaData.language).toUpperCase() + "</h3>";
         result += categories.tests;
       }
       
       if (categories.comments)
       {
-        result += "<h3>" + translate("comments", PEMInstallationAPIObject.language).toUpperCase() + "</h3>";
+        result += "<h3>" + translate("comments", PEMTaskMetaData.language).toUpperCase() + "</h3>";
         result += transformHtml(addSources(categories.comments));
       }
       
@@ -484,9 +448,12 @@ task.load = function(views, callback) // TODO: handle views
   
   var initLoadAjax = function()
   {
-    fillResources(FIOITaskMetaData, function() {
-      console.log(PEMInstallationAPIObject);
-    }, true);
+    task.getResources(function(PEMInstallationAPIObject) {
+      fillResources(FIOITaskMetaData, PEMInstallationAPIObject, function() {
+         console.log(PEMInstallationAPIObject);
+       }, true);
+    });
+    
     var tests = $('<script id="tests" type="text/template"></script>');
     var waiting = 1;
     function doneCB(x) { return function(data) { x.text(data); }; }

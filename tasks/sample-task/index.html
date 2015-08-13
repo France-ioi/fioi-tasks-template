@@ -9,14 +9,15 @@
     <script class="module" src="../../modules/ext/jquery/1.7/jquery.min.js" id="http://code.jquery.com/jquery-1.7.1.min.js"></script>
     <script class="module" src="../../modules/ext/syntaxHighlighter/3.0.83/shAll.min.js" id="fioi-shAll.min.js"></script>
     <script class="module" src="../../modules/ext/jquery-ui/1.10/jquery-ui-1.10.3.custom.min.js" id="http://code.jquery.com/ui/1.10.3/jquery-ui.min.js"></script>
+    <script class="remove" type="text/javascript" src="../../fioi-pem-api.js" id="fioi-pem-api.js"></script>
     <script class="remove" type="text/javascript" src="../../modules/integrationAPI.01/installationAPI.01/pemFioi/installation.js" id="http://www.france-ioi.org/modules/integrationAPI.01/installationAPI.01/pemFioi/installation.js"></script>
     <script class="proxy module" type="text/javascript" src="../../modules/integrationAPI.01/official/platform-pr.js" id="http://www.france-ioi.org/modules/integrationAPI.01/official/platform-pr.js"></script>
     <script class="module" src="../../operation.js" id="fioi-operation.js"></script>
     <script class="module" src="../../tools.js" id="fioi-tools.js"></script>
     <script class="remove" type="text/javascript" src="../../modules/integrationAPI.01/official/miniPlatform.js" id="http://www.france-ioi.org/modules/integrationAPI.01/official/miniPlatform.js"></script>
     <script type="text/javascript" class="remove">
-      // general metadata conforming the Bebras Installation API Documentation
-      var PEMInstallationAPIObject = {
+      // general metadata conforming the PEM API Documentation for getMetaData
+      var PEMTaskMetaData = {
         // title is automatically fetched from the <title> markup
         id : 'FranceIOI/Samples/GitTaskSample',
         license : 'MIT',
@@ -35,6 +36,14 @@
         solutionSources : {
           "firstSource" : [ "sol.cpp",  "sol.c",  "sol.java",  "sol.jvs",  "sol.pas",  "sol.py" ]
         },
+        /* 
+           source for hint 1 would be
+           hintsSources: {
+              1: {
+                 "firstHintSource" : [ "hint.cpp", "hint.py", etc. ]
+              }
+           }
+        */
         taskSamples : ["id0"],
         graderSamples: ["id1"]
       }
