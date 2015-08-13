@@ -13,7 +13,6 @@
     <script class="remove" type="text/javascript" src="../../modules/integrationAPI.01/installationAPI.01/pemFioi/installation.js" id="http://www.france-ioi.org/modules/integrationAPI.01/installationAPI.01/pemFioi/installation.js"></script>
     <script class="proxy module" type="text/javascript" src="../../modules/integrationAPI.01/official/platform-pr.js" id="http://www.france-ioi.org/modules/integrationAPI.01/official/platform-pr.js"></script>
     <script class="module" src="../../operation.js" id="fioi-operation.js"></script>
-    <script class="module" src="../../tools.js" id="fioi-tools.js"></script>
     <script class="remove" type="text/javascript" src="../../modules/integrationAPI.01/official/miniPlatform.js" id="http://www.france-ioi.org/modules/integrationAPI.01/official/miniPlatform.js"></script>
     <script type="text/javascript" class="remove">
       // general metadata conforming the PEM API Documentation for getMetaData
@@ -33,8 +32,12 @@
           time : { "*" : 2, "cpp" : 1 },
           memory : { "*" : 16000, "python" : 20000 }
         },
+        // This lists all possible languages
+        supportedLanguages: ['c', 'cpp', 'java', 'javascool', 'pascal', 'python', 'ocaml'],
+        // file extensions must follow the following conventions so that language is recognized automatically.
+        // Additionally, a .txt file is recognized as 'pseudo' language
         solutionSources : {
-          "firstSource" : [ "sol.cpp",  "sol.c",  "sol.java",  "sol.jvs",  "sol.pas",  "sol.py" ]
+          "firstSource" : [ "sol.cpp",  "sol.c",  "sol.java",  "sol.jvs",  "sol.pas",  "sol.py" , "sol.ml"]
         },
         /* 
            source for hint 1 would be
@@ -51,27 +54,45 @@
   </head>
   <body>
 
-    <div class="task">
+    <div id="task">
 
       <!-- Limits specified in metadata.js will be automatically inserted here -->
 
-      <h1>STATEMENT</h1>
+      <h3 id="statement">Statement</h3>
       <p>Task main statement, mandatory. You are currently using {LANGPROG}, lowercase {LANGPROG_L}.</p>
 
-      <img src="task-image.jpg">
+      <img src="task-image.png">
 
-      <pre class="code lang-c-cpp">
+      <!-- possible classes for classes are 'lang-c', 'lang-cpp', 'lang-ocaml',
+              'lang-java', 'lang-javascool', 'lang-python', 'lang-pseudo',
+              'lang-pascal' -->
+      <!-- use 'lang-all' to display with any value of current language -->
+      <!-- Note that you have to escape double quotes -->
+      <pre class="code lang-c lang-cpp" data-code="
+         #include <iostream>
          this_is_c_or_cpp_code();
-      </pre>
-      <pre class="code lang-ocaml">
-         this_is_ocaml_code ();;
-      </pre>
+         
+         #include <iostream>
+         using namespace std;
+          
+         int main()
+         {
+            cout << &quot;Hello world!&quot;;
+         }
+      "></pre>
 
-      <div class="specific" data-lang="java, c, cpp ,jvs">
-         <pre class="code lang-all">this_is_specific_to_c_cpp_java_and_javascool ();</pre>
+      <pre class="code lang-ocaml" data-code="
+         this_is_ocaml_code ();;
+      "></pre>
+
+      <div class="specific" data-lang="java, c, cpp ,javascool">
+         <!-- languages in specific tags are : 'java', 'javascool',
+              'c', 'cpp', 'ocaml', 'python', 'pascal' -->
+         <!-- TODO: replace jvs by javascool to have something homogenous -->
+         <pre class="code lang-all" data-code="this_is_specific_to_c_cpp_java_and_javascool ();"></pre>
       </div>
 
-      <h1>CONSTRAINTS</h1>
+      <h3 id="constraints">Constraints</h3>
       <p>This optional block is for additional constraints (in addition to cpu, memory, time, etc. limits):</p>
       <ul>
       <li>constraint 1</li>
@@ -79,15 +100,14 @@
       <li>...</li>
       </ul>
 
-      <h1>INPUT</h1>
+      <h3 id="input">Input</h3>
       <p>This optional block is to explain the input.</p>
 
-      <h1>OUTPUT</h1>
+      <h3 id="output">Output</h3>
       <p>This optional block explains the expected output.</p>
 
-      <h1>COMMENTS</h1>
+      <h3 id="comments">Comments</h3>
       Optional. You can use it to give an example of code using the library:
-      <div class="codeTabs source task-source" data-group="templateSource"></div>
 
       <div id="animation-0" class="animation">
         This animation demonstrates the use of previous source code. You can include css and js.
@@ -105,14 +125,10 @@
 
     <div id="solution">
       The solution in the current language:
-      <div class="source solution-source" data-group="firstSource"></div>
+      <div class="source" data-source-name="firstSource"></div>
       
       The solutions in all languages (with tabs):
-      <div class="codeTabs source solution-source" data-group="firstSource">
-        <pre class="code lang-pseudo">
-          This will be an additional tab with pseudo-code
-        </pre>
-      </div>
+      <div class="all-sources" data-source-name="firstSource"></div>
     </div>
 
   </body>

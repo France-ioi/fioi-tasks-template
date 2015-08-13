@@ -19,9 +19,9 @@ task.showViews = function(views, callback)
 {
    $.each(['task', 'hints', 'solution'], function(i, view) {
       if (view in views)
-        $(view).show();
+        $('#'+view).show();
       else
-        $(view).hide();
+        $('#'+view).hide();
    });
    callback();
 };
@@ -31,7 +31,5 @@ task.getMetaData = function(callback) {
 };
 
 window.task = task;
-
-console.error(task);
 
 })();
